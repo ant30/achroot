@@ -1,0 +1,82 @@
+# Anocher chroot utils
+# Author: Antonio Perez-Aranda Alcaide <ant30tx at gmail.com>
+# Copyright (C) 2012 by Antonio Perez-Aranda Alcaide <ant30tx at gmail.com>
+# Version: 0.0.1
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 US
+
+
+achroot () {
+    cmd=$1
+    shift 1
+    case $cmd in
+        mount|umount|enter|untar|tar)
+            cmd_achroot_$cmd $@
+            return 0
+            ;;
+        *)
+            echo "Usage: $0 [mount|umount|enter|untar|tar]"
+            ;;
+    esac
+}
+
+is_mounted () {
+    if mount | grep "$1/dev" > /dev/null ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+cmd_achroot_mount () {
+	chr=$1
+    is_mounted && return 0
+	sudo mount -o bind /dev $chr/dev
+	sudo mount -o bind /dev/pts $chr/dev/pts
+	sudo mount -o bind /proc $chr/proc
+	sudo mount -o bind /sys $chr/sys
+}
+
+cmd_achroot_umount () {
+	chr=$1
+    is_mounted || return 0
+	sudo umount -f $chr/dev/pts
+	sudo umount -f $chr/dev
+	sudo umount -f $chr/proc
+	sudo umount -f $chr/sys 
+}
+
+
+cmd_achroot_enter () {
+    chr=$1
+    cmd_achroot_mount $chr
+    env debian_chroot=$(basename $chr) sudo -H chroot $chr
+}
+
+cmd_achroot_untar () {
+	template=$1
+	chr=$2
+	sudo mkdir -p $chr
+	sudo tar xvf  $template -C $chr
+	sudo chmod a+rx $chr/root
+}
+
+cmd_achroot_tar () {
+	chr=$1
+	tarname=$2
+	sudo tar zcvf $tarname -C $chr .
+}
+
+achroot $@
