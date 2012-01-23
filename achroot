@@ -43,10 +43,10 @@ is_mounted () {
 cmd_achroot_mount () {
 	chr=$1
     is_mounted && return 0
-	sudo mount -o bind /dev $chr/dev
-	sudo mount -o bind /dev/pts $chr/dev/pts
-	sudo mount -o bind /proc $chr/proc
-	sudo mount -o bind /sys $chr/sys
+	sudo mount --bind /dev $chr/dev
+	sudo mount --bind /dev/pts $chr/dev/pts
+	sudo mount --bind /proc $chr/proc
+	sudo mount --bind /sys $chr/sys
 }
 
 cmd_achroot_umount () {
