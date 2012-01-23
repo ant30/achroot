@@ -33,6 +33,7 @@ achroot () {
 }
 
 is_mounted () {
+    tpath=$(basename $1)
     if mount | grep "$1/dev" > /dev/null ; then
         return 0
     else
