@@ -42,7 +42,7 @@ is_mounted () {
 
 cmd_achroot_mount () {
 	chr=$1
-    is_mounted && return 0
+    is_mounted $chr && return 0
 	sudo mount --bind /dev $chr/dev
 	sudo mount --bind /dev/pts $chr/dev/pts
 	sudo mount --bind /proc $chr/proc
@@ -51,7 +51,7 @@ cmd_achroot_mount () {
 
 cmd_achroot_umount () {
 	chr=$1
-    is_mounted || return 0
+    is_mounted $chr || return 0
 	sudo umount -f $chr/dev/pts
 	sudo umount -f $chr/dev
 	sudo umount -f $chr/proc
